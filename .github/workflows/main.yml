@@ -15,10 +15,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3  # Updated to latest version
 
-      # Step 2: Unzip CashApp project (if it's still zipped)
+      # Step 2: Unzip CashApp project (cashapp.xcodeproj.zip)
       - name: Unzip CashApp project
         run: |
-          unzip ${{ github.workspace }}/Cash\ App.xcworkspace.zip -d ${{ github.workspace }}
+          unzip ${{ github.workspace }}/cashapp.xcodeproj.zip -d ${{ github.workspace }}
 
       # Step 3: Set up Xcode
       - name: Set up Xcode
@@ -28,7 +28,7 @@ jobs:
       # Step 4: Build the app
       - name: Build iOS app
         run: |
-          xcodebuild -workspace CashApp.xcworkspace \
+          xcodebuild -workspace ${{ github.workspace }}/CashApp.xcworkspace \
             -scheme CashAppSpoof \
             -sdk iphoneos \
             -configuration Release \
