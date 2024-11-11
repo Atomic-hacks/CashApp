@@ -36,8 +36,8 @@ jobs:
       run: |
         # Build and archive the app
         xcodebuild clean \
-          -workspace "CashAppSpoof.xcworkspace" \
-          -scheme "CashAppSpoof" \
+          -workspace "CashappSpoof.xcworkspace" \
+          -scheme "CashappSpoof" \
           CODE_SIGN_IDENTITY="iPhone Developer" \
           PROVISIONING_PROFILE_SPECIFIER="<YOUR_PROVISIONING_PROFILE>" \
           CODE_SIGN_STYLE="Automatic" \
