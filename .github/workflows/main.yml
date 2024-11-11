@@ -1,52 +1,56 @@
-name: Build iOS App
+name: Build and Export IPA
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   build:
-    runs-on: macos-latest  # Run on a macOS machine
+    runs-on: macos-latest
 
     steps:
-      # Step 1: Check out the code
-      - name: Checkout repository
-        uses: actions/checkout@v3  # Updated to latest version
+      # Step 1: Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      # Step 2: Unzip Cash App project (ensure the zip file is uploaded in the repo)
-      - name: Unzip Cash App project
+      # Step 2: Set up certificates and provisioning profiles
+      - name: Setup Certificates and Provisioning Profiles
         run: |
-          unzip "${{ github.workspace }}/Cash App.xcodeproj.zip" -d "${{ github.workspace }}"
+          echo "${{ secrets.CERTIFICATE }}" | base64 --decode > certificate.p12
+          echo "${{ secrets.PROFILE }}" | base64 --decode > profile.mobileprovision
+          security create-keychain -p "${{ secrets.KEY_PASSWORD }}" build.keychain
+          security import certificate.p12 -A -k ~/Library/Keychains/build.keychain
+          cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+        env:
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
-      # Step 3: Debug - List files to confirm extraction
-      - name: List files after unzipping
+      # Step 4: Set up Xcode environment
+      - name: Set up Xcode
         run: |
-          ls -R "${{ github.workspace }}"  # Recursively list all files to verify project.xcworkspace location
+          sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
 
-      # Step 4: Build the app with xcodebuild
-      - name: Build iOS app
+      # Step 5: Build and Archive the app
+      - name: Build and Archive iOS App
         run: |
           xcodebuild -workspace "${{ github.workspace }}/Cash App.xcodeproj/project.xcworkspace" \
             -scheme CashappSpoof \
             -sdk iphoneos \
             -configuration Release \
-            -archivePath "${{ github.workspace }}/build/CashappSpoof.xcarchive" \
-            -destination "generic/platform=iOS" \
+            -archivePath "${{ github.workspace }}/build/CashAppSpoof.xcarchive" \
             archive
 
-      # Step 5: Export the .ipa file using the exportOptions.plist
+      # Step 6: Export the .ipa file
       - name: Export .ipa file
         run: |
           xcodebuild -exportArchive \
-            -archivePath "${{ github.workspace }}/build/CashappSpoof.xcarchive" \
-            -exportOptionsPlist "${{ github.workspace }}/exportOptions.plist" \
+            -archivePath "${{ github.workspace }}/build/CashAppSpoof.xcarchive" \
+            -exportOptionsPlist exportOptions.plist \
             -exportPath "${{ github.workspace }}/build"
 
-      # Step 6: Upload the .ipa file as an artifact
-      - name: Upload .ipa file as an artifact
-        uses: actions/upload-artifact@v3  # Updated to latest version
+      # Step 7: Upload the .ipa file
+      - name: Upload .ipa file
+        uses: actions/upload-artifact@v3
         with:
           name: CashAppSpoof.ipa
-          path: "${{ github.workspace }}/build/CashAppSpoof.ipa"
+          path: build/CashAppSpoof.ipa
