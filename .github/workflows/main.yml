@@ -20,13 +20,7 @@ jobs:
         run: |
           sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 
-      # Step 3: Install CocoaPods (if needed)
-      - name: Install CocoaPods dependencies
-        run: |
-          sudo gem install cocoapods
-          pod install
-
-      # Step 4: Build the app
+      # Step 3: Build the app
       - name: Build iOS app
         run: |
           xcodebuild -workspace CashAppSpoof.xcworkspace \
@@ -36,7 +30,7 @@ jobs:
             -archivePath ${{ github.workspace }}/build/CashAppSpoof.xcarchive \
             archive
 
-      # Step 5: Export the .ipa file
+      # Step 4: Export the .ipa file
       - name: Export .ipa file
         run: |
           xcodebuild -exportArchive \
@@ -44,7 +38,7 @@ jobs:
             -exportOptionsPlist exportOptions.plist \
             -exportPath ${{ github.workspace }}/build
 
-      # Step 6: Upload the .ipa file as an artifact
+      # Step 5: Upload the .ipa file as an artifact
       - name: Upload .ipa file as an artifact
         uses: actions/upload-artifact@v3  # Updated to latest version
         with:
