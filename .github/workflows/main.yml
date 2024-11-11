@@ -15,22 +15,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3  # Updated to latest version
 
-      # Step 2: Set up Xcode
+      # Step 2: Unzip CashApp project (if it's still zipped)
+      - name: Unzip CashApp project
+        run: |
+          unzip ${{ github.workspace }}/Cash\ App.xcworkspace.zip -d ${{ github.workspace }}
+
+      # Step 3: Set up Xcode
       - name: Set up Xcode
         run: |
           sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 
-      # Step 3: Build the app
+      # Step 4: Build the app
       - name: Build iOS app
         run: |
-          xcodebuild -workspace CashAppSpoof.xcworkspace \
+          xcodebuild -workspace CashApp.xcworkspace \
             -scheme CashAppSpoof \
             -sdk iphoneos \
             -configuration Release \
             -archivePath ${{ github.workspace }}/build/CashAppSpoof.xcarchive \
             archive
 
-      # Step 4: Export the .ipa file
+      # Step 5: Export the .ipa file
       - name: Export .ipa file
         run: |
           xcodebuild -exportArchive \
@@ -38,7 +43,7 @@ jobs:
             -exportOptionsPlist exportOptions.plist \
             -exportPath ${{ github.workspace }}/build
 
-      # Step 5: Upload the .ipa file as an artifact
+      # Step 6: Upload the .ipa file as an artifact
       - name: Upload .ipa file as an artifact
         uses: actions/upload-artifact@v3  # Updated to latest version
         with:
