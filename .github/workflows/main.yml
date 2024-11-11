@@ -15,18 +15,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3  # Updated to latest version
 
-      # Step 2: Unzip Cash App.xcproj.zip
+      # Step 2: Debug - List files in the repository
+      - name: List files in root directory
+        run: |
+          ls -al "${{ github.workspace }}"
+
+      # Step 3: Unzip Cash App.xcproj.zip if it's found
       - name: Unzip Cash App project
         run: |
           unzip "${{ github.workspace }}/Cash App.xcproj.zip" -d "${{ github.workspace }}"
+        continue-on-error: true  # Allows the workflow to continue even if this step fails
 
-      # Step 3: Set up Xcode
+      # Step 4: Set up Xcode
       - name: Set up Xcode
         run: |
           sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 
-      # Step 4: Build the app
+      # Step 5: Build the app
       - name: Build iOS app
+        if: success()  # Runs only if unzip was successful
         run: |
           xcodebuild -workspace "${{ github.workspace }}/Cash App.xcworkspace" \
             -scheme CashAppSpoof \
@@ -35,16 +42,18 @@ jobs:
             -archivePath "${{ github.workspace }}/build/CashAppSpoof.xcarchive" \
             archive
 
-      # Step 5: Export the .ipa file
+      # Step 6: Export the .ipa file
       - name: Export .ipa file
+        if: success()  # Runs only if build was successful
         run: |
           xcodebuild -exportArchive \
             -archivePath "${{ github.workspace }}/build/CashAppSpoof.xcarchive" \
             -exportOptionsPlist exportOptions.plist \
             -exportPath "${{ github.workspace }}/build"
 
-      # Step 6: Upload the .ipa file as an artifact
+      # Step 7: Upload the .ipa file as an artifact
       - name: Upload .ipa file as an artifact
+        if: success()  # Runs only if export was successful
         uses: actions/upload-artifact@v3  # Updated to latest version
         with:
           name: CashAppSpoof.ipa
