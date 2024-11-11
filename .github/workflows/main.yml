@@ -32,7 +32,7 @@ jobs:
             -scheme CashappSpoof \
             -sdk iphoneos \
             -configuration Release \
-            -archivePath "${{ github.workspace }}/build/CashAppSpoof.xcarchive" \
+            -archivePath "${{ github.workspace }}/build/CashappSpoof.xcarchive" \
             -destination "generic/platform=iOS" \
             archive
 
@@ -40,7 +40,7 @@ jobs:
       - name: Export .ipa file
         run: |
           xcodebuild -exportArchive \
-            -archivePath "${{ github.workspace }}/build/CashAppSpoof.xcarchive" \
+            -archivePath "${{ github.workspace }}/build/CashappSpoof.xcarchive" \
             -exportOptionsPlist "${{ github.workspace }}/exportOptions.plist" \
             -exportPath "${{ github.workspace }}/build"
 
