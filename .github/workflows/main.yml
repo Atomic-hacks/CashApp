@@ -34,7 +34,7 @@ jobs:
       - name: Build iOS app
         run: |
           xcodebuild -workspace "${{ github.workspace }}/Cash App.xcodeproj/project.xcworkspace" \
-            -scheme CashAppSpoof \
+            -scheme CashappSpoof \
             -sdk iphoneos \
             -configuration Release \
             -archivePath "${{ github.workspace }}/build/CashAppSpoof.xcarchive" \
