@@ -1,0 +1,52 @@
+name: Build iOS App
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-latest  # Run on a macOS machine
+
+    steps:
+      # Step 1: Check out the code
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Step 2: Set up Xcode
+      - name: Set up Xcode
+        run: |
+          sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+
+      # Step 3: Install CocoaPods (if needed)
+      - name: Install CocoaPods dependencies
+        run: |
+          sudo gem install cocoapods
+          pod install
+
+      # Step 4: Build the app
+      - name: Build iOS app
+        run: |
+          xcodebuild -workspace CashAppSpoof.xcworkspace \  # App workspace name
+          -scheme CashAppSpoof \                             # Scheme name
+          -sdk iphoneos \
+          -configuration Release \
+          -archivePath ${{ github.workspace }}/build/CashAppSpoof.xcarchive \
+          archive
+
+      # Step 5: Export the .ipa file
+      - name: Export .ipa file
+        run: |
+          xcodebuild -exportArchive \
+          -archivePath ${{ github.workspace }}/build/CashAppSpoof.xcarchive \
+          -exportOptionsPlist exportOptions.plist \  # Uses your exportOptions.plist file
+          -exportPath ${{ github.workspace }}/build
+
+      # Step 6: Upload the .ipa file as an artifact
+      - name: Upload .ipa file as an artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: CashAppSpoof.ipa
+          path: build/CashAppSpoof.ipa
