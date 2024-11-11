@@ -30,7 +30,7 @@ jobs:
         run: |
           sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 
-      # Step 5: Build the app
+      # Step 5: Build the app with a specified destination
       - name: Build iOS app
         run: |
           xcodebuild -workspace "${{ github.workspace }}/Cash App.xcodeproj/project.xcworkspace" \
@@ -38,6 +38,7 @@ jobs:
             -sdk iphoneos \
             -configuration Release \
             -archivePath "${{ github.workspace }}/build/CashAppSpoof.xcarchive" \
+            -destination "generic/platform=iOS" \
             archive
 
       # Step 6: Export the .ipa file
