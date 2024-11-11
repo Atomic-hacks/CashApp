@@ -33,7 +33,7 @@ jobs:
       # Step 5: Build the app
       - name: Build iOS app
         run: |
-          xcodebuild -workspace "${{ github.workspace }}/project.xcworkspace" \
+          xcodebuild -workspace "${{ github.workspace }}/Cash App/project.xcworkspace" \
             -scheme CashAppSpoof \
             -sdk iphoneos \
             -configuration Release \
